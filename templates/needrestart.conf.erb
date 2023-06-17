@@ -1,0 +1,40 @@
+# Managed by Puppet
+<% scope['needrestart::config_options'].each do |keys, values| -%>
+<% if values.is_a?(String) -%>
+$nrconf{<%= keys %>} = '<%= values -%>';
+<% end -%>
+<% if values.is_a?(Integer) -%>
+$nrconf{<%= keys %>} = <%= values -%>;
+<% end -%>
+<% if values.is_a?(Array) -%>
+$nrconf{<%= keys %>} = [
+<% values.each do |value| -%>
+    <%= value %>,
+<% end -%>
+];
+<% end -%>
+<% if values.is_a?(Hash) -%>
+$nrconf{<%= keys %>} {
+<% values.each do |key, value| -%>
+<% if value.is_a?(String) -%>
+    <%= key %> => '<%= value %>',
+<% elsif value.is_a?(Integer) -%>
+    <%= key %> => <%= value %>,
+<% elsif value.is_a?(Array) -%>
+    <%= key %> = [
+<% value.each do |v| %>
+    <%= v %>,
+<% end %>
+]
+<% end -%>
+<% end -%>
+};
+<% end -%>
+<% end -%>
+if(-d q(/etc/needrestart/conf.d)) {
+      foreach my $fn (sort </etc/needrestart/conf.d/*.conf>) {
+              print STDERR "$LOGPREF eval $fn\n" if($nrconf{verbosity} > 1);
+              eval do { local(@ARGV, $/) = $fn; <>};
+              die "Error parsing $fn: $@" if($@);
+      }
+}
