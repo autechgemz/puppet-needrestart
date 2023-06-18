@@ -14,7 +14,7 @@ $nrconf{<%= keys %>} = [
 ];
 <% end -%>
 <% if values.is_a?(Hash) -%>
-$nrconf{<%= keys %>} {
+$nrconf{<%= keys %>} = {
 <% values.each do |key, value| -%>
 <% if value.is_a?(String) -%>
     <%= key %> => '<%= value %>',
